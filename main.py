@@ -115,10 +115,6 @@ class GraphicsView(QGraphicsView):
         view_rect = rectf.translate(view_rect, value)
         self.setSceneRect(view_rect)
 
-        m = QTransform()
-        m.scale(self.width() / view_rect.width(), self.height() / view_rect.height())
-        self.setTransform(m)
-
         return view_rect
     
     def __scale(self, value: QPointF, pivot: QPointF) -> QRectF:
