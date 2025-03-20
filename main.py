@@ -58,12 +58,12 @@ class GraphicsView(QGraphicsView):
             view_rect = self.__scale(scale, pivot)
             self.scene().update_grid(view_rect)
         
-        return super().wheelEvent(event)
+        super().wheelEvent(event)
     
     def mousePressEvent(self, event: QMouseEvent):
         self.__last_mouse_pos = event.position()
         self.__mouse_press_pos = event.position()
-        return super().mousePressEvent(event)
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if Qt.KeyboardModifier.AltModifier in event.modifiers():
@@ -90,12 +90,12 @@ class GraphicsView(QGraphicsView):
                 self.scene().update_grid(view_rect)
 
         self.__last_mouse_pos = event.position()
-        return super().mouseMoveEvent(event)
+        super().mouseMoveEvent(event)
     
     def mouseReleaseEvent(self, event: QMouseEvent):
         self.__last_mouse_pos = QPointF()
         self.__mouse_press_pos = QPointF()
-        return super().mouseReleaseEvent(event)
+        super().mouseReleaseEvent(event)
     
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_F:
@@ -104,7 +104,7 @@ class GraphicsView(QGraphicsView):
             view_rect = self.__move(delta)
             self.scene().update_grid(view_rect)
             
-        return super().keyPressEvent(event)
+        super().keyPressEvent(event)
     
     def add_item(self):
         self.scene().add_item()
@@ -117,7 +117,6 @@ class GraphicsView(QGraphicsView):
 
         m = QTransform()
         m.scale(self.width() / view_rect.width(), self.height() / view_rect.height())
-        m.translate(value.x(), value.y())
         self.setTransform(m)
 
         return view_rect
@@ -144,7 +143,6 @@ class GraphicsScene(QGraphicsScene):
         super().__init__(parent)
 
         self.__grid = SceneGrid()
-        self.sceneRectChanged.connect(self.update_grid)
 
         for i in range(10):
             x = (i - 5) * 50
@@ -184,12 +182,14 @@ class SceneGrid(object):
         self.__lines: List[QLine] = []
 
     def update(self, rect: QRectF):
+        unit = self.update_unit
+
         def _fit(_v, _start):
-            _ofs = _v % self.update_unit
+            _ofs = _v % unit
             if not _start:
-                _ofs = self.update_unit - _ofs
+                _ofs = unit - _ofs
             if _ofs == 0:
-                _ofs = self.update_unit
+                _ofs = unit
             return _v + (-1 if _start else 1) * _ofs
         
         left = _fit(rect.left(), True)
@@ -202,7 +202,7 @@ class SceneGrid(object):
         ofs_top = math.fabs(top - gr.top())
         ofs_right = math.fabs(right - gr.right())
         ofs_bottom = math.fabs(bottom - gr.bottom())
-        if ofs_left < self.update_unit and ofs_top < self.update_unit and ofs_right < self.update_unit and ofs_bottom < self.update_unit:
+        if ofs_left < unit and ofs_top < unit and ofs_right < unit and ofs_bottom < unit:
             return
         
         lines = []
